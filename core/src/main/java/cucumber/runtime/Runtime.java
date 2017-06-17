@@ -7,6 +7,7 @@ import cucumber.api.SummaryPrinter;
 import cucumber.api.event.EventHandler;
 import cucumber.api.event.TestCaseFinished;
 import cucumber.api.event.TestRunFinished;
+import cucumber.api.event.TestRunStarted;
 import cucumber.api.event.TestStepFinished;
 import cucumber.api.formatter.Formatter;
 import cucumber.runner.EventBus;
@@ -56,6 +57,12 @@ public class Runtime {
     private final List<PicklePredicate> filters;
     private final EventBus bus;
     private final Compiler compiler = new Compiler();
+    private final EventHandler<TestRunStarted> testRunStartedHandler = new EventHandler<TestRunStarted>() {
+        @Override
+        public void receive(TestRunStarted event) {
+            stats.setStartTime(event.getTimeStamp());
+        }
+    };
     private final EventHandler<TestStepFinished> stepFinishedHandler = new EventHandler<TestStepFinished>() {
         @Override
         public void receive(TestStepFinished event) {
@@ -63,10 +70,8 @@ public class Runtime {
             if (result.getError() != null) {
                 addError(result.getError());
             }
-            if (event.testStep.isHook()) {
-                addHookToCounterAndResult(result);
-            } else {
-                addStepToCounterAndResult(result);
+            if (!event.testStep.isHook()) {
+                stats.addStep(result);
             }
         }
     };
@@ -74,6 +79,12 @@ public class Runtime {
         @Override
         public void receive(TestCaseFinished event) {
             stats.addScenario(event.result.getStatus(), event.testCase.getScenarioDesignation());
+        }
+    };
+    private final EventHandler<TestRunFinished> testRunFinishedHandler = new EventHandler<TestRunFinished>() {
+        @Override
+        public void receive(TestRunFinished event) {
+            stats.setFinishTime(event.getTimeStamp());
         }
     };
 
@@ -116,8 +127,10 @@ public class Runtime {
             this.filters.add(new LinePredicate(lineFilters));
         }
 
+        bus.registerHandlerFor(TestRunStarted.class, testRunStartedHandler);
         bus.registerHandlerFor(TestStepFinished.class, stepFinishedHandler);
         bus.registerHandlerFor(TestCaseFinished.class, testCaseFinishedHandler);
+        bus.registerHandlerFor(TestRunFinished.class, testRunFinishedHandler);
         undefinedStepsTracker.setEventPublisher(bus);
         runtimeOptions.setEventBus(bus);
     }
@@ -248,14 +261,6 @@ public class Runtime {
             return false;
         }
         return Arrays.binarySearch(ASSUMPTION_VIOLATED_EXCEPTIONS, t.getClass().getName()) >= 0;
-    }
-
-    private void addStepToCounterAndResult(Result result) {
-        stats.addStep(result);
-    }
-
-    private void addHookToCounterAndResult(Result result) {
-        stats.addHookTime(result.getDuration());
     }
 
     public EventBus getEventBus() {

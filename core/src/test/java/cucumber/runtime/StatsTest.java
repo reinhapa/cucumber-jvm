@@ -15,6 +15,7 @@ import java.util.Locale;
 import org.junit.Test;
 
 public class StatsTest {
+    public static final long ANY_TIME = 1234567890;
     public static final long ONE_MILLI_SECOND = 1000000;
     private static final long ONE_HOUR = 60 * Stats.ONE_MINUTE;
 
@@ -99,14 +100,12 @@ public class StatsTest {
     }
 
     @Test
-    public void should_include_hook_time_and_step_time_has_executed() {
+    public void should_report_the_difference_between_finish_time_and_start_time() {
         Stats counter = createMonochromeSummaryCounter();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        counter.addHookTime(ONE_MILLI_SECOND);
-        counter.addStep(new Result(Result.Type.PASSED, ONE_MILLI_SECOND, null));
-        counter.addStep(new Result(Result.Type.PASSED, ONE_MILLI_SECOND, null));
-        counter.addHookTime(ONE_MILLI_SECOND);
+        counter.setStartTime(ANY_TIME);
+        counter.setFinishTime(ANY_TIME + 4*ONE_MILLI_SECOND);
         counter.printStats(new PrintStream(baos), isStrict(false));
 
         assertThat(baos.toString(), endsWith(String.format(
@@ -118,9 +117,8 @@ public class StatsTest {
         Stats counter = createMonochromeSummaryCounter();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        counter.addStep(new Result(Result.Type.PASSED, Stats.ONE_MINUTE, null));
-        counter.addStep(new Result(Result.Type.PASSED, Stats.ONE_SECOND, null));
-        counter.addStep(new Result(Result.Type.PASSED, ONE_MILLI_SECOND, null));
+        counter.setStartTime(ANY_TIME);
+        counter.setFinishTime(ANY_TIME + Stats.ONE_MINUTE + Stats.ONE_SECOND + ONE_MILLI_SECOND);
         counter.printStats(new PrintStream(baos), isStrict(false));
 
         assertThat(baos.toString(), endsWith(String.format(
@@ -132,8 +130,8 @@ public class StatsTest {
         Stats counter = createMonochromeSummaryCounter();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        counter.addStep(new Result(Result.Type.PASSED, ONE_HOUR, null));
-        counter.addStep(new Result(Result.Type.PASSED, Stats.ONE_MINUTE, null));
+        counter.setStartTime(ANY_TIME);
+        counter.setFinishTime(ANY_TIME + ONE_HOUR + Stats.ONE_MINUTE);
         counter.printStats(new PrintStream(baos), isStrict(false));
 
         assertThat(baos.toString(), endsWith(String.format(
@@ -145,9 +143,8 @@ public class StatsTest {
         Stats counter = new Stats(true, Locale.GERMANY);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        counter.addStep(new Result(Result.Type.PASSED, Stats.ONE_MINUTE, null));
-        counter.addStep(new Result(Result.Type.PASSED, Stats.ONE_SECOND, null));
-        counter.addStep(new Result(Result.Type.PASSED, ONE_MILLI_SECOND, null));
+        counter.setStartTime(ANY_TIME);
+        counter.setFinishTime(ANY_TIME + Stats.ONE_MINUTE + Stats.ONE_SECOND + ONE_MILLI_SECOND);
         counter.printStats(new PrintStream(baos), isStrict(false));
 
         assertThat(baos.toString(), endsWith(String.format(

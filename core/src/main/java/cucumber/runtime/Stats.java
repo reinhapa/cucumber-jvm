@@ -18,6 +18,7 @@ class Stats {
     public static final long ONE_MINUTE = 60 * ONE_SECOND;
     private SubCounts scenarioSubCounts = new SubCounts();
     private SubCounts stepSubCounts = new SubCounts();
+    private long startTime = 0;
     private long totalDuration = 0;
     private Formats formats;
     private Locale locale;
@@ -118,19 +119,18 @@ class Stats {
 
     public void addStep(Result result) {
         addResultToSubCount(stepSubCounts, result.getStatus());
-        addTime(result.getDuration());
     }
 
     public void addScenario(Result.Type resultStatus) {
         addResultToSubCount(scenarioSubCounts, resultStatus);
     }
 
-    public void addHookTime(Long duration) {
-        addTime(duration);
+    public void setStartTime(Long startTime) {
+        this.startTime = startTime;
     }
 
-    private void addTime(Long duration) {
-        totalDuration += duration != null ? duration : 0;
+    public void setFinishTime(Long finishTime) {
+        this.totalDuration = finishTime - startTime;
     }
 
     private void addResultToSubCount(SubCounts subCounts, Result.Type resultStatus) {
