@@ -8,7 +8,7 @@ public interface TimeService {
     TimeService SYSTEM = new TimeService() {
         @Override
         public long startTime() {
-            return System.nanoTime();
+            return currentTime();
         }
 
         @Override
@@ -18,7 +18,7 @@ public interface TimeService {
 
         @Override
         public long finishTime() {
-            return System.nanoTime();
+            return currentTime();
         }
     };
 
@@ -39,23 +39,28 @@ public interface TimeService {
 
         @Override
         public long finishTime() {
-            long result = getCurrentTime();
-            if (startTimeWasLastCall) {
-                result += duration;
-                currentTime.set(result);
-            }
-            startTimeWasLastCall = false;
-            return result;
+            return currentTime();
         }
 
         @Override
         public long currentTime() {
-            return getCurrentTime();
+            long result = getCurrentTime();
+            result = incrementTimeIfstartTimeWasLastCall(result);
+            return result;
         }
 
         private long getCurrentTime() {
             Long result = currentTime.get();
             return result != null ? result : 0l;
+        }
+
+        private long incrementTimeIfstartTimeWasLastCall(long result) {
+            if (startTimeWasLastCall) {
+                result += duration;
+                currentTime.set(result);
+                startTimeWasLastCall = false;
+            }
+            return result;
         }
     }
 }
