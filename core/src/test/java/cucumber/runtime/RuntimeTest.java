@@ -4,6 +4,8 @@ import cucumber.api.PendingException;
 import cucumber.api.Result;
 import cucumber.api.Scenario;
 import cucumber.api.StepDefinitionReporter;
+import cucumber.api.TestCase;
+import cucumber.api.event.TestCaseFinished;
 import cucumber.runtime.formatter.FormatterSpy;
 import cucumber.runtime.io.ClasspathResourceLoader;
 import cucumber.runtime.io.Resource;
@@ -50,6 +52,7 @@ import static org.mockito.Mockito.when;
 
 public class RuntimeTest {
     private final static String ENGLISH = "en";
+    private final static long ANY_TIMESTAMP = 1234567890;
 
     @Ignore
     @Test
@@ -123,45 +126,49 @@ public class RuntimeTest {
     }
 
     @Test
-    public void strict_without_pending_steps_or_errors() {
+    public void strict_with_passed_scenarios() {
         Runtime runtime = createStrictRuntime();
+        runtime.getEventBus().send(testCaseFinishedWithStatus(Result.Type.PASSED));
 
         assertEquals(0x0, runtime.exitStatus());
     }
 
     @Test
-    public void non_strict_without_pending_steps_or_errors() {
+    public void non_strict_with_passed_scenarios() {
         Runtime runtime = createNonStrictRuntime();
+        runtime.getEventBus().send(testCaseFinishedWithStatus(Result.Type.PASSED));
 
         assertEquals(0x0, runtime.exitStatus());
     }
 
     @Test
-    public void non_strict_with_undefined_steps() {
+    public void non_strict_with_undefined_scenarios() {
         Runtime runtime = createNonStrictRuntime();
-        runtime.stats.addScenario(Result.Type.UNDEFINED, "scenario designation");
+        runtime.getEventBus().send(testCaseFinishedWithStatus(Result.Type.UNDEFINED));
+
         assertEquals(0x0, runtime.exitStatus());
     }
 
     @Test
-    public void strict_with_undefined_steps() {
+    public void strict_with_undefined_scenarios() {
         Runtime runtime = createStrictRuntime();
-        runtime.stats.addScenario(Result.Type.UNDEFINED, "scenario designation");
+        runtime.getEventBus().send(testCaseFinishedWithStatus(Result.Type.UNDEFINED));
+
         assertEquals(0x1, runtime.exitStatus());
     }
 
     @Test
-    public void strict_with_pending_steps_and_no_errors() {
+    public void strict_with_pending_scenarios() {
         Runtime runtime = createStrictRuntime();
-        runtime.stats.addScenario(Result.Type.PENDING, "scenario designation");
+        runtime.getEventBus().send(testCaseFinishedWithStatus(Result.Type.PENDING));
 
         assertEquals(0x1, runtime.exitStatus());
     }
 
     @Test
-    public void non_strict_with_pending_steps() {
+    public void non_strict_with_pending_scenarios() {
         Runtime runtime = createNonStrictRuntime();
-        runtime.stats.addScenario(Result.Type.PENDING, "scenario designation");
+        runtime.getEventBus().send(testCaseFinishedWithStatus(Result.Type.PENDING));
 
         assertEquals(0x0, runtime.exitStatus());
     }
@@ -169,23 +176,31 @@ public class RuntimeTest {
     @Test
     public void non_strict_with_skipped_scenarios() {
         Runtime runtime = createNonStrictRuntime();
-        runtime.stats.addScenario(Result.Type.SKIPPED, "scenario designation");
+        runtime.getEventBus().send(testCaseFinishedWithStatus(Result.Type.SKIPPED));
 
         assertEquals(0x0, runtime.exitStatus());
     }
 
     @Test
-    public void non_strict_with_errors() {
+    public void strict_with_skipped_scenarios() {
         Runtime runtime = createNonStrictRuntime();
-        runtime.stats.addScenario(Result.Type.FAILED, "scenario designation");
+        runtime.getEventBus().send(testCaseFinishedWithStatus(Result.Type.SKIPPED));
+
+        assertEquals(0x0, runtime.exitStatus());
+    }
+
+    @Test
+    public void non_strict_with_failed_scenarios() {
+        Runtime runtime = createNonStrictRuntime();
+        runtime.getEventBus().send(testCaseFinishedWithStatus(Result.Type.FAILED));
 
         assertEquals(0x1, runtime.exitStatus());
     }
 
     @Test
-    public void strict_with_errors() {
+    public void strict_with_failed_scenarios() {
         Runtime runtime = createStrictRuntime();
-        runtime.stats.addScenario(Result.Type.FAILED, "scenario designation");
+        runtime.getEventBus().send(testCaseFinishedWithStatus(Result.Type.FAILED));
 
         assertEquals(0x1, runtime.exitStatus());
     }
@@ -567,5 +582,9 @@ public class RuntimeTest {
 
     private int stepCount(int stepCount) {
         return stepCount;
+    }
+
+    private TestCaseFinished testCaseFinishedWithStatus(Result.Type resultStatus) {
+        return new TestCaseFinished(ANY_TIMESTAMP, mock(TestCase.class), new Result(resultStatus, null, null));
     }
 }
