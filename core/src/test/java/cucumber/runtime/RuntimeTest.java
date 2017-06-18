@@ -4,21 +4,18 @@ import cucumber.api.PendingException;
 import cucumber.api.Result;
 import cucumber.api.Scenario;
 import cucumber.api.StepDefinitionReporter;
-import cucumber.api.TestStep;
 import cucumber.runtime.formatter.FormatterSpy;
 import cucumber.runtime.io.ClasspathResourceLoader;
 import cucumber.runtime.io.Resource;
 import cucumber.runtime.io.ResourceLoader;
 import cucumber.runtime.model.CucumberFeature;
 import gherkin.events.PickleEvent;
-import gherkin.pickles.Argument;
 import gherkin.pickles.Pickle;
 import gherkin.pickles.PickleLocation;
 import gherkin.pickles.PickleStep;
 import gherkin.pickles.PickleTag;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.AssumptionViolatedException;
 import org.mockito.ArgumentCaptor;
 
 import java.io.ByteArrayOutputStream;
@@ -142,20 +139,21 @@ public class RuntimeTest {
     @Test
     public void non_strict_with_undefined_steps() {
         Runtime runtime = createNonStrictRuntime();
-        runtime.undefinedStepsTracker.handleTestStepFinished(testStep(), mockResultWithSnippets());
+        runtime.stats.addScenario(Result.Type.UNDEFINED, "scenario designation");
         assertEquals(0x0, runtime.exitStatus());
     }
 
+    @Test
     public void strict_with_undefined_steps() {
         Runtime runtime = createStrictRuntime();
-        runtime.undefinedStepsTracker.handleTestStepFinished(testStep(), mockResultWithSnippets());
+        runtime.stats.addScenario(Result.Type.UNDEFINED, "scenario designation");
         assertEquals(0x1, runtime.exitStatus());
     }
 
     @Test
     public void strict_with_pending_steps_and_no_errors() {
         Runtime runtime = createStrictRuntime();
-        runtime.addError(new PendingException());
+        runtime.stats.addScenario(Result.Type.PENDING, "scenario designation");
 
         assertEquals(0x1, runtime.exitStatus());
     }
@@ -163,23 +161,15 @@ public class RuntimeTest {
     @Test
     public void non_strict_with_pending_steps() {
         Runtime runtime = createNonStrictRuntime();
-        runtime.addError(new PendingException());
+        runtime.stats.addScenario(Result.Type.PENDING, "scenario designation");
 
         assertEquals(0x0, runtime.exitStatus());
     }
 
     @Test
-    public void non_strict_with_failed_junit_assumption_prior_to_junit_412() {
+    public void non_strict_with_skipped_scenarios() {
         Runtime runtime = createNonStrictRuntime();
-        runtime.addError(new org.junit.internal.AssumptionViolatedException("should be treated like skipped"));
-
-        assertEquals(0x0, runtime.exitStatus());
-    }
-
-    @Test
-    public void non_strict_with_failed_junit_assumption_from_junit_412_on() {
-        Runtime runtime = createNonStrictRuntime();
-        runtime.addError(new AssumptionViolatedException("should be treated like skipped"));
+        runtime.stats.addScenario(Result.Type.SKIPPED, "scenario designation");
 
         assertEquals(0x0, runtime.exitStatus());
     }
@@ -187,7 +177,7 @@ public class RuntimeTest {
     @Test
     public void non_strict_with_errors() {
         Runtime runtime = createNonStrictRuntime();
-        runtime.addError(new RuntimeException());
+        runtime.stats.addScenario(Result.Type.FAILED, "scenario designation");
 
         assertEquals(0x1, runtime.exitStatus());
     }
@@ -195,7 +185,7 @@ public class RuntimeTest {
     @Test
     public void strict_with_errors() {
         Runtime runtime = createStrictRuntime();
-        runtime.addError(new RuntimeException());
+        runtime.stats.addScenario(Result.Type.FAILED, "scenario designation");
 
         assertEquals(0x1, runtime.exitStatus());
     }
@@ -577,19 +567,5 @@ public class RuntimeTest {
 
     private int stepCount(int stepCount) {
         return stepCount;
-    }
-
-    private TestStep testStep() {
-        TestStep testStep = mock(TestStep.class);
-        PickleStep pickleStep = new PickleStep("step text", Collections.<Argument>emptyList(), Collections.<PickleLocation>emptyList());
-        when(testStep.getPickleStep()).thenReturn(pickleStep);
-        return testStep;
-    }
-
-    private Result mockResultWithSnippets() {
-        Result result = mock(Result.class);
-        when(result.getStatus()).thenReturn(Result.Type.UNDEFINED);
-        when(result.getSnippets()).thenReturn(asList(""));
-        return result;
     }
 }

@@ -34,13 +34,12 @@ public class StatsTest {
     @Test
     public void should_only_print_sub_counts_if_not_zero() {
         Stats counter = createMonochromeSummaryCounter();
-        Result passedResult = createResultWithStatus(Result.Type.PASSED);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        counter.addStep(passedResult);
-        counter.addStep(passedResult);
-        counter.addStep(passedResult);
-        counter.addScenario(Result.Type.PASSED);
+        counter.addStep(Result.Type.PASSED);
+        counter.addStep(Result.Type.PASSED);
+        counter.addStep(Result.Type.PASSED);
+        counter.addScenario(Result.Type.PASSED, "scenario designation");
         counter.printStats(new PrintStream(baos), isStrict(false));
 
         assertThat(baos.toString(), startsWith(String.format(
@@ -156,11 +155,11 @@ public class StatsTest {
         Stats counter = createMonochromeSummaryCounter();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        counter.addStep(createResultWithStatus(Result.Type.FAILED));
+        counter.addStep(Result.Type.FAILED);
         counter.addScenario(Result.Type.FAILED, "path/file.feature:3 # Scenario: scenario_name");
-        counter.addStep(createResultWithStatus(Result.Type.UNDEFINED));
+        counter.addStep(Result.Type.UNDEFINED);
         counter.addScenario(Result.Type.UNDEFINED, "path/file.feature:3 # Scenario: scenario_name");
-        counter.addStep(createResultWithStatus(Result.Type.PENDING));
+        counter.addStep(Result.Type.PENDING);
         counter.addScenario(Result.Type.PENDING, "path/file.feature:3 # Scenario: scenario_name");
         counter.printStats(new PrintStream(baos), isStrict(false));
 
@@ -176,11 +175,11 @@ public class StatsTest {
         Stats counter = createMonochromeSummaryCounter();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        counter.addStep(createResultWithStatus(Result.Type.FAILED));
+        counter.addStep(Result.Type.FAILED);
         counter.addScenario(Result.Type.FAILED, "path/file.feature:3 # Scenario: scenario_name");
-        counter.addStep(createResultWithStatus(Result.Type.UNDEFINED));
+        counter.addStep(Result.Type.UNDEFINED);
         counter.addScenario(Result.Type.UNDEFINED, "path/file.feature:3 # Scenario: scenario_name");
-        counter.addStep(createResultWithStatus(Result.Type.PENDING));
+        counter.addStep(Result.Type.PENDING);
         counter.addScenario(Result.Type.PENDING, "path/file.feature:3 # Scenario: scenario_name");
         counter.printStats(new PrintStream(baos), isStrict(true));
 
@@ -198,12 +197,8 @@ public class StatsTest {
     }
 
     private void addOneStepScenario(Stats counter, Result.Type status) {
-        counter.addStep(createResultWithStatus(status));
+        counter.addStep(status);
         counter.addScenario(status, "scenario designation");
-    }
-
-    private Result createResultWithStatus(Result.Type status) {
-        return new Result(status, 0l, null);
     }
 
     private Stats createMonochromeSummaryCounter() {
