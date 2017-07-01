@@ -41,6 +41,7 @@
         <jsoup.version>1.9.2</jsoup.version>
         <testng.version>6.9.10</testng.version>
         <junit.version>4.12</junit.version>
+        <junit-jupiter.version>5.0.0-M4</junit-jupiter.version>
         <jython.version>2.7.0</jython.version>
         <mockito.version>1.10.19</mockito.version>
         <selenium.version>3.4.0</selenium.version>
@@ -184,12 +185,12 @@
                 <version>${picocontainer.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.cucumber</groupId>
+                <groupId>info.cukes</groupId>
                 <artifactId>cucumber-android</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.cucumber</groupId>
+                <groupId>info.cukes</groupId>
                 <artifactId>android-examples</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -342,6 +343,16 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>${junit-jupiter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit-jupiter.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.testng</groupId>
@@ -592,6 +603,14 @@
                 <module>gosu</module>
                 <module>java8</module>
                 <module>kotlin-java8</module>
+                <module>jupiter</module>
+            </modules>
+        </profile>
+
+        <profile>
+            <id>android-examples</id>
+            <modules>
+                <module>examples/android</module>
             </modules>
         </profile>
 
@@ -685,7 +704,7 @@
                             <version>${groovy.version}</version>
                         </dependency>
                         <dependency>
-                            <groupId>io.cucumber</groupId>
+                            <groupId>info.cukes</groupId>
                             <artifactId>gherkin</artifactId>
                             <version>${gherkin.version}</version>
                         </dependency>
@@ -711,7 +730,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.6.1</version>
+                    <version>3.5.1</version>
                     <configuration>
                         <encoding>UTF-8</encoding>
                         <source>1.6</source>
@@ -828,11 +847,6 @@
                 </plugin>
 
                 <!-- Non-standard plugins -->
-                <plugin>
-                    <groupId>com.lazerycode.selenium</groupId>
-                    <artifactId>driver-binary-downloader-maven-plugin</artifactId>
-                    <version>${driver-binary-downloader-maven-plugin.version}</version>
-                </plugin>
 
                 <plugin>
                     <groupId>net.alchim31.maven</groupId>
