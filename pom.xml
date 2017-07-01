@@ -185,12 +185,12 @@
                 <version>${picocontainer.version}</version>
             </dependency>
             <dependency>
-                <groupId>info.cukes</groupId>
+                <groupId>io.cucumber</groupId>
                 <artifactId>cucumber-android</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>info.cukes</groupId>
+                <groupId>io.cucumber</groupId>
                 <artifactId>android-examples</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -608,13 +608,6 @@
         </profile>
 
         <profile>
-            <id>android-examples</id>
-            <modules>
-                <module>examples/android</module>
-            </modules>
-        </profile>
-
-        <profile>
             <id>junit-4.12</id>
             <properties>
                 <junit.version>4.12</junit.version>
@@ -704,7 +697,7 @@
                             <version>${groovy.version}</version>
                         </dependency>
                         <dependency>
-                            <groupId>info.cukes</groupId>
+                            <groupId>io.cucumber</groupId>
                             <artifactId>gherkin</artifactId>
                             <version>${gherkin.version}</version>
                         </dependency>
@@ -730,7 +723,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.5.1</version>
+                    <version>3.6.1</version>
                     <configuration>
                         <encoding>UTF-8</encoding>
                         <source>1.6</source>
@@ -847,6 +840,11 @@
                 </plugin>
 
                 <!-- Non-standard plugins -->
+                <plugin>
+                    <groupId>com.lazerycode.selenium</groupId>
+                    <artifactId>driver-binary-downloader-maven-plugin</artifactId>
+                    <version>${driver-binary-downloader-maven-plugin.version}</version>
+                </plugin>
 
                 <plugin>
                     <groupId>net.alchim31.maven</groupId>
