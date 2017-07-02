@@ -1,5 +1,6 @@
 package cucumber.runtime.junit.jupiter;
 
+import cucumber.runner.EventBus;
 import gherkin.formatter.Reporter;
 import gherkin.formatter.model.Match;
 import gherkin.formatter.model.Result;
@@ -15,9 +16,12 @@ import java.util.Map;
  * Not thread safe. The logic relies on a result being associated with the most
  * recently started scenario or scenario outline.
  */
-public class JunitJupiterReporter implements Reporter {
-  public JunitJupiterReporter(Reporter reporter) {
-    this.reporter = reporter;
+public class JunitJupiterReporter {
+    private final boolean strict;
+
+  public JunitJupiterReporter(EventBus bus, boolean strict) {
+      this.strict = strict;
+      this.reporter = reporter;
   }
 
   public Result getResult(TagStatement statement) { return results.get(statement.getId()); }

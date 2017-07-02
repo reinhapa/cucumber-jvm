@@ -1,19 +1,15 @@
 package cucumber.api.junit.jupiter;
 
+import cucumber.api.Result;
+import cucumber.api.Scenario;
+import cucumber.api.formatter.Formatter;
 import cucumber.runtime.Runtime;
 import cucumber.runtime.RuntimeOptions;
 import cucumber.runtime.RuntimeOptionsFactory;
 import cucumber.runtime.io.MultiLoader;
 import cucumber.runtime.io.ResourceLoaderClassFinder;
 import cucumber.runtime.junit.jupiter.JunitJupiterReporter;
-import cucumber.runtime.model.CucumberExamples;
 import cucumber.runtime.model.CucumberFeature;
-import cucumber.runtime.model.CucumberScenario;
-import cucumber.runtime.model.CucumberScenarioOutline;
-import gherkin.formatter.Formatter;
-import gherkin.formatter.Reporter;
-import gherkin.formatter.model.Result;
-import gherkin.formatter.model.Scenario;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.extension.*;
@@ -66,15 +62,14 @@ public class CucumberExtension implements ParameterResolver, AfterAllCallback {
     }
 
     Class testClass = extensionContext.getTestClass().get();
-    RuntimeOptions options = new RuntimeOptionsFactory(testClass).create();
+    RuntimeOptions runtimeOptions = new RuntimeOptionsFactory(testClass).create();
     ClassLoader classLoader = testClass.getClassLoader();
     MultiLoader resourceLoader = new MultiLoader(classLoader);
     ResourceLoaderClassFinder classFinder = new ResourceLoaderClassFinder(resourceLoader, classLoader);
-    runtime = new Runtime(resourceLoader, classFinder, classLoader, options);
-    List<CucumberFeature> cucumberFeatures = options.cucumberFeatures(resourceLoader);
-    formatter = options.formatter(classLoader);
-    reporter = options.reporter(classLoader);
-    jupiterReporter = new JunitJupiterReporter(reporter);
+    runtime = new Runtime(resourceLoader, classFinder, classLoader, runtimeOptions);
+    List<CucumberFeature> cucumberFeatures = runtimeOptions.cucumberFeatures(resourceLoader, runtime.getEventBus());
+    formatter = runtimeOptions.formatter(classLoader);
+    jupiterReporter = new JunitJupiterReporter(runtime.getEventBus(), runtimeOptions.isStrict());
 
     return cucumberFeatures.stream().flatMap(feature -> {
       formatter.uri(feature.getPath());
