@@ -7,34 +7,29 @@ import cucumber.runtime.Glue;
 import cucumber.runtime.UnreportedStepExecutor;
 import cucumber.runtime.io.ResourceLoader;
 import cucumber.runtime.snippets.FunctionNameGenerator;
-import gherkin.formatter.model.Step;
+import gherkin.pickles.PickleStep;
 
 /**
  * We need an implementation of Backend to prevent Runtime from blowing up.
  */
 public class StubBackend implements Backend {
-    public StubBackend(ResourceLoader resourceLoader) {
-
-    }
+    public StubBackend(ResourceLoader resourceLoader) {}
 
     @Override
-    public void loadGlue(Glue glue, List<String> gluePaths) {
-    }
+    public void loadGlue(Glue glue, List<String> gluePaths) {}
 
     @Override
-    public void setUnreportedStepExecutor(UnreportedStepExecutor executor) {
-    }
+    public void setUnreportedStepExecutor(UnreportedStepExecutor executor) {}
 
     @Override
-    public void buildWorld() {
-    }
+    public void buildWorld() {}
 
     @Override
-    public void disposeWorld() {
-    }
+    public void disposeWorld() {}
 
     @Override
-    public String getSnippet(Step step, FunctionNameGenerator functionNameGenerator) {
+    public String getSnippet(PickleStep step, String keyword,
+            FunctionNameGenerator functionNameGenerator) {
         return "STUB SNIPPET";
     }
 }

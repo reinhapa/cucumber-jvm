@@ -1,71 +1,69 @@
 package cucumber.runtime.junit.jupiter;
 
-import cucumber.runner.EventBus;
-import gherkin.formatter.Reporter;
-import gherkin.formatter.model.Match;
-import gherkin.formatter.model.Result;
-import gherkin.formatter.model.Scenario;
-import gherkin.formatter.model.TagStatement;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import cucumber.api.Result;
+import cucumber.runner.EventBus;
+
 /**
- * A Reporter that decorates the provided classes with the
- * ability to look up results by scenario or scenario outline.
- * Not thread safe. The logic relies on a result being associated with the most
+ * A Reporter that decorates the provided classes with the ability to look up results by scenario or
+ * scenario outline. Not thread safe. The logic relies on a result being associated with the most
  * recently started scenario or scenario outline.
  */
 public class JunitJupiterReporter {
     private final boolean strict;
+    // private TagStatement currentStatement = null;
+    // private final Reporter reporter;
+    private final Map<String, Result> results = new HashMap<>();
 
-  public JunitJupiterReporter(EventBus bus, boolean strict) {
-      this.strict = strict;
-      this.reporter = reporter;
-  }
-
-  public Result getResult(TagStatement statement) { return results.get(statement.getId()); }
-
-  public void scenario(Scenario scenario) {
-    currentStatement = scenario;
-    results.put(scenario.getId(), Result.UNDEFINED);
-  }
-
-  /**
-   * Called once per step.
-   * @param result The result of the step that has just been executed.
-   */
-  @Override
-  public void result(Result result) {
-    reporter.result(result);
-    if (currentStatement != null) {
-      results.put(currentStatement.getId(), result);
-      // Once a scenario has a failed step, it's failed.
-      // Later steps will be recorded as skipped, but we don't want to let that change the result of the scenario.
-      if (Result.FAILED.equals(result.getStatus())) { currentStatement = null; }
+    public JunitJupiterReporter(EventBus bus, boolean strict) {
+        this.strict = strict;
     }
-  }
 
-  @Override
-  public void before(Match match, Result result) { reporter.before(match, result); }
+    // public Result getResult(TagStatement statement) { return results.get(statement.getId()); }
+    //
+    // public void scenario(Scenario scenario) {
+    // currentStatement = scenario;
+    // results.put(scenario.getId(), Result.UNDEFINED);
+    // }
 
-  @Override
-  public void after(Match match, Result result) { reporter.after(match, result); }
+    /**
+     * Called once per step.
+     * 
+     * @param result The result of the step that has just been executed.
+     */
+    // @Override
+    // public void result(Result result) {
+    // reporter.result(result);
+    // if (currentStatement != null) {
+    // results.put(currentStatement.getId(), result);
+    // // Once a scenario has a failed step, it's failed.
+    // // Later steps will be recorded as skipped, but we don't want to let that change the result
+    // of
+    // the scenario.
+    // if (Result.FAILED.equals(result.getStatus())) { currentStatement = null; }
+    // }
+    // }
 
-  /**
-   * Called when a Java step is matched and about to be called.
-   * @param match The match, which includes details about the feature file.
-   */
-  @Override
-  public void match(Match match) { reporter.match(match); }
+    // @Override
+    // public void before(Match match, Result result) { reporter.before(match, result); }
 
-  @Override
-  public void embedding(String mimeType, byte[] data) { reporter.embedding(mimeType, data); }
+    // @Override
+    // public void after(Match match, Result result) { reporter.after(match, result); }
 
-  @Override
-  public void write(String text) { reporter.write(text); }
+    /**
+     * Called when a Java step is matched and about to be called.
+     * 
+     * @param match The match, which includes details about the feature file.
+     */
+    // @Override
+    // public void match(Match match) { reporter.match(match); }
 
-  private TagStatement currentStatement = null;
-  private final Reporter reporter;
-  private final Map<String, Result> results = new HashMap<>();
+    // @Override
+    // public void embedding(String mimeType, byte[] data) { reporter.embedding(mimeType, data); }
+
+    // @Override
+    // public void write(String text) { reporter.write(text); }
+
 }
