@@ -13,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
-import org.mockito.exceptions.Reporter;
 
 import cucumber.api.formatter.Formatter;
 import cucumber.runtime.Runtime;
@@ -44,7 +43,6 @@ import gherkin.ast.ScenarioDefinition;
  */
 public class CucumberExtension implements ParameterResolver, AfterAllCallback {
     private JunitJupiterReporter jupiterReporter;
-    private Reporter reporter;
     private Formatter formatter;
     private Runtime runtime;
 
