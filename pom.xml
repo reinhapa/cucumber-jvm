@@ -41,7 +41,7 @@
         <jsoup.version>1.9.2</jsoup.version>
         <testng.version>6.9.10</testng.version>
         <junit.version>4.12</junit.version>
-        <junit-jupiter.version>5.0.0-M4</junit-jupiter.version>
+        <junit-jupiter.version>5.0.0-M5</junit-jupiter.version>
         <jython.version>2.7.0</jython.version>
         <mockito.version>1.10.19</mockito.version>
         <selenium.version>3.4.0</selenium.version>
